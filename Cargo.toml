@@ -1,15 +1,15 @@
 [package]
-name = "ndebele-pl"
+name = "qho"
 version = "0.1.0"
 edition = "2024"
 description = "The Ndebele programming language interpreter"
 license = "MIT"
-repository = "https://github.com/your-username/ndebele-pl"
+repository = "https://github.com/mtnyoni/qho"
 keywords = ["language", "interpreter", "ndebele"]
 categories = ["command-line-utilities"]
 
 [[bin]]
-name = "ndebele-pl"
+name = "qho"
 path = "src/main.rs"
 
 [dependencies]
