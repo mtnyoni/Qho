@@ -1,8 +1,7 @@
 #[cfg(test)]
-use std::collections::HashMap;
+use crate::interpreter::{Interpreter, Value};
 use crate::lexer::Lexer;
 use crate::parser::Parser;
-use crate::interpreter::{Interpreter, Value};
 
 /// Run source and return the interpreter after execution (so we can inspect vars)
 fn run(src: &str) -> Interpreter {
@@ -187,7 +186,10 @@ fn test_struct_instantiate_default_fields() {
         bumba Point p;
     ");
     match interp.get_var("p") {
-        Some(Value::Instance { struct_name, fields }) => {
+        Some(Value::Instance {
+            struct_name,
+            fields,
+        }) => {
             assert_eq!(struct_name, "Point");
             assert!(matches!(fields.get("x"), Some(Value::Number(n)) if *n == 0.0));
             assert!(matches!(fields.get("y"), Some(Value::Number(n)) if *n == 0.0));
