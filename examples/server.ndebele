@@ -1,41 +1,41 @@
 // Define a Server struct
-isakhi Server {
+isakhi iServer {
     ibala IP
     inombolo port
 
-    isigoqelo Start() {
-        bhala("Server starting...");
+    isigoqelo qala() {
+        bhala("iServer qalaing...");
         bhala(mina.IP);
         bhala(mina.port);
     }
 
-    isigoqelo Accept() {
-        bhala("Accepting connections...");
+    isigoqelo yamukelaIConnection() {
+        bhala("Yamukela isixhumano...");
     }
 
-    isigoqelo Send(msg: ibala) {
-        bhala("Sending:");
+    isigoqelo thumela(msg: ibala) {
+        bhala("Thumeza:");
         bhala(msg);
     }
 
-    isigoqelo Recv() {
-        bhala("Receiving data...");
+    isigoqelo yamukelaUmlayezo() {
+        bhala("yemukela idata...");
     }
 }
 
 // Standalone function
-isigoqelo greet(name: ibala) {
+isigoqelo khulumisa(name: ibala) {
     bhala("Sawubona,");
     bhala(name);
 }
 
-// Create a server instance and use it
-bumba Server s;
+// Create a iserver instance and use it
+bumba iServer s;
 s.IP = "127.0.0.1";
 s.port = 8080;
-s.Start();
-s.Accept();
-s.Send("Hello network!");
-s.Recv();
+s.qala();
+s.yamukelaIConnection();
+s.thumela("Sabona nhlanganiso yegagasi!");
+s.yamukelaUmlayezo();
 
-greet("Tawanda");
+khulumisa("Tawanda");

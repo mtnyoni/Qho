@@ -1,24 +1,23 @@
 // Echo client — sends messages and prints server responses
 // Run after server: qho examples/echo_client.ndebele
 
-yenza conn = TCP::xhumana("127.0.0.1:8080");
+yenza iConnection = TCP::xhumana("127.0.0.1:8080");
+bhala("Sesixhumile kuEcho server");
 
-bhala("Connected to echo server.");
-
-TCP::thumela(conn, "Sawubona Server!");
-yenza impendulo = TCP::funda(conn);
-bhala("Server said:");
+TCP::thumela(iConnection, "Sawubona Server!");
+yenza impendulo = TCP::funda(iConnection);
+bhala("iServer ithi: ");
 bhala(impendulo);
 
-TCP::thumela(conn, "Kunjani?");
-yenza impendulo2 = TCP::funda(conn);
-bhala("Server said:");
+TCP::thumela(iConnection, "Kunjani?");
+yenza impendulo2 = TCP::funda(iConnection);
+bhala("iServer ithi: ");
 bhala(impendulo2);
 
-TCP::thumela(conn, "Ngiyabonga. Sala kahle!");
-yenza impendulo3 = TCP::funda(conn);
-bhala("Server said:");
+TCP::thumela(iConnection, "Ngiyabonga. Sala kahle!");
+yenza impendulo3 = TCP::funda(iConnection);
+bhala("iServer ithi: ");
 bhala(impendulo3);
 
-TCP::vala(conn);
-bhala("Connection closed.");
+TCP::vala(iConnection);
+bhala("iConnection selivalekile.");
