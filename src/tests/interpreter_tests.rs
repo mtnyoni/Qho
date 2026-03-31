@@ -52,13 +52,13 @@ fn test_declare_string() {
 
 #[test]
 fn test_declare_val_string() {
-    let interp = run(r#"bamba x = "hello";"#);
+    let interp = run(r#"yenza x = "hello";"#);
     assert_eq!(get_str(&interp, "x"), "hello");
 }
 
 #[test]
 fn test_declare_val_number() {
-    let interp = run("bamba x = 99;");
+    let interp = run("yenza x = 99;");
     assert_eq!(get_num(&interp, "x"), 99.0);
 }
 
@@ -146,9 +146,9 @@ fn test_function_def_and_call() {
 fn test_function_return_value() {
     let interp = run("
         isigoqelo getNum() {
-            phendusa 7;
+            phendukisa 7;
         }
-        bamba r = getNum();
+        yenza r = getNum();
     ");
     assert_eq!(get_num(&interp, "r"), 7.0);
 }
@@ -157,9 +157,9 @@ fn test_function_return_value() {
 fn test_function_with_param() {
     let interp = run(r#"
         isigoqelo echo(msg: ibala) {
-            phendusa msg;
+            phendukisa msg;
         }
-        bamba r = echo("hello");
+        yenza r = echo("hello");
     "#);
     assert_eq!(get_str(&interp, "r"), "hello");
 }
@@ -168,9 +168,9 @@ fn test_function_with_param() {
 fn test_function_return_none() {
     let interp = run("
         isigoqelo noop() {
-            phendusa;
+            phendukisa;
         }
-        bamba r = noop();
+        yenza r = noop();
     ");
     assert!(matches!(interp.get_var("r"), Some(Value::Nil)));
 }
@@ -184,7 +184,7 @@ fn test_struct_instantiate_default_fields() {
             inombolo x
             inombolo y
         }
-        umba Point p;
+        bumba Point p;
     ");
     match interp.get_var("p") {
         Some(Value::Instance { struct_name, fields }) => {
@@ -200,7 +200,7 @@ fn test_struct_instantiate_default_fields() {
 fn test_struct_field_assign() {
     let interp = run("
         isakhi Point { inombolo x inombolo y }
-        umba Point p;
+        bumba Point p;
         p.x = 10;
         p.y = 20;
     ");
@@ -219,12 +219,12 @@ fn test_struct_method_call() {
         isakhi Greeter {
             ibala name
             isigoqelo greet() {
-                phendusa mina.name;
+                phendukisa mina.name;
             }
         }
-        umba Greeter g;
+        bumba Greeter g;
         g.name = "Tawanda";
-        bamba result = g.greet();
+        yenza result = g.greet();
     "#);
     assert_eq!(get_str(&interp, "result"), "Tawanda");
 }
@@ -238,7 +238,7 @@ fn test_struct_method_mutates_field() {
                 mina.count = 0;
             }
         }
-        umba Counter c;
+        bumba Counter c;
         c.count = 99;
         c.reset();
     ");
@@ -252,7 +252,7 @@ fn test_struct_method_mutates_field() {
 #[test]
 fn test_nil_equality() {
     let interp = run("
-        bamba x = akulalutho;
+        yenza x = akulalutho;
         uma (x == akulalutho) { inombolo isNil = 1; }
     ");
     assert_eq!(get_num(&interp, "isNil"), 1.0);

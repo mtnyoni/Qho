@@ -37,7 +37,7 @@ Files must have the `.ndebele` extension.
 | `bhala` | print to console |
 | `inombolo` | number type (float64) |
 | `ibala` | string type |
-| `bamba` | generic value binding (sockets, listeners, etc.) |
+| `yenza` | generic value binding (sockets, listeners, etc.) |
 | `uma` | if |
 | `phindaUma` | while loop |
 | `phinda` | infinite loop (like Rust's `loop`) |
@@ -45,9 +45,9 @@ Files must have the `.ndebele` extension.
 | `qhubeka` | continue |
 | `isigoqelo` | function |
 | `isakhi` | struct |
-| `umba` | instantiate a struct |
+| `bumba` | instantiate a struct |
 | `mina` | self (inside methods) |
-| `phendusa` | return |
+| `phendukisa` | return |
 | `akulalutho` | null value |
 
 ### Variables
@@ -55,7 +55,7 @@ Files must have the `.ndebele` extension.
 ```js
 inombolo iminyaka = 25;
 ibala ibizo = "Tawanda";
-bamba conn = tcpXhumana("127.0.0.1:8080");
+yenza conn = tcpXhumana("127.0.0.1:8080");
 ```
 
 ### Functions
@@ -82,7 +82,7 @@ isakhi Server {
     }
 }
 
-umba Server s;
+bumba Server s;
 s.IP = "127.0.0.1";
 s.port = 8080;
 s.qala();
@@ -128,13 +128,13 @@ All networking functions are built-in — no imports needed.
 ### Echo Server Example
 
 ```js
-bamba listener = tcpLalela("127.0.0.1:8080");
+yenza listener = tcpLalela("127.0.0.1:8080");
 
 phinda {
-    bamba conn = tcpAmukela(listener);
+    yenza conn = tcpAmukela(listener);
 
     phinda {
-        bamba msg = tcpFunda(conn);
+        yenza msg = tcpFunda(conn);
 
         uma (msg == akulalutho) {
             tcpVala(conn);
@@ -182,7 +182,7 @@ examples/
 
 ### Done
 - [x] Lexer and parser
-- [x] Variables (`inombolo`, `ibala`, `bamba`)
+- [x] Variables (`inombolo`, `ibala`, `yenza`)
 - [x] Functions (`isigoqelo`)
 - [x] Structs and methods (`isakhi`, `mina`)
 - [x] Control flow (`uma`, `phindaUma`, `phinda`, `phuma`, `qhubeka`)

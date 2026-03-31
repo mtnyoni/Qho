@@ -65,7 +65,7 @@ pub enum Stmt {
     DeclareNumber { name: String, value: f64 },
     /// ibala s = "hi";
     DeclareString { name: String, value: String },
-    /// bamba x = expr;  -- generic binding, accepts any value
+    /// yenza x = expr;  -- generic binding, accepts any value
     DeclareVal { name: String, expr: Expr },
     /// bhala(expr);
     Print(Expr),
@@ -85,7 +85,7 @@ pub enum Stmt {
     FunctionDef { name: String, params: Vec<Param>, body: Vec<Stmt> },
     /// isakhi Name { fields... methods... }
     StructDef { name: String, fields: Vec<FieldDef>, methods: Vec<MethodDef> },
-    /// umba Server s;
+    /// bumba Server s;
     Instantiate { struct_name: String, var_name: String },
     /// expr;  -- covers calls like server.Start(); or greet("hi");
     ExprStmt(Expr),

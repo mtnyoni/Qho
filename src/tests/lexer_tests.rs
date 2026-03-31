@@ -8,7 +8,7 @@ fn lex(src: &str) -> Vec<Token> {
 
 #[test]
 fn test_keywords() {
-    let tokens = lex("bhala inombolo ibala uma phindaUma phinda phuma qhubeka isigoqelo isakhi umba bamba phendusa mina akulalutho");
+    let tokens = lex("bhala inombolo ibala uma phindaUma phinda phuma qhubeka isigoqelo isakhi bumba yenza phendukisa mina akulalutho");
     assert_eq!(tokens[0],  Token::Bhala);
     assert_eq!(tokens[1],  Token::Inombolo);
     assert_eq!(tokens[2],  Token::Ibala);

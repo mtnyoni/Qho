@@ -1,15 +1,15 @@
 // Echo server — keeps running, echoes back whatever the client sends
 // Run first: qho examples/echo_server.ndebele
 
-bamba listener = tcpLalela("127.0.0.1:8080");
+yenza listener = tcpLalela("127.0.0.1:8080");
 bhala("Echo server ready. Waiting for connections...");
 
 phinda {
-    bamba conn = tcpAmukela(listener);
+    yenza conn = tcpAmukela(listener);
     bhala("Client connected. Reading messages...");
 
     phinda {
-        bamba msg = tcpFunda(conn);
+        yenza msg = tcpFunda(conn);
 
         // nil means client disconnected
         uma (msg == akulalutho) {

@@ -23,7 +23,7 @@ fn test_parse_string_declaration() {
 
 #[test]
 fn test_parse_bamba_declaration() {
-    let stmts = parse(r#"bamba x = "hello";"#);
+    let stmts = parse(r#"yenza x = "hello";"#);
     assert!(matches!(&stmts[0], Stmt::DeclareVal { name, .. } if name == "x"));
 }
 
@@ -101,7 +101,7 @@ fn test_parse_function_call() {
 
 #[test]
 fn test_parse_return_value() {
-    let stmts = parse("isigoqelo add(x: inombolo) { phendusa x; }");
+    let stmts = parse("isigoqelo add(x: inombolo) { phendukisa x; }");
     match &stmts[0] {
         Stmt::FunctionDef { body, .. } => {
             assert!(matches!(&body[0], Stmt::Return(Some(_))));
@@ -112,7 +112,7 @@ fn test_parse_return_value() {
 
 #[test]
 fn test_parse_return_empty() {
-    let stmts = parse("isigoqelo noop() { phendusa; }");
+    let stmts = parse("isigoqelo noop() { phendukisa; }");
     match &stmts[0] {
         Stmt::FunctionDef { body, .. } => {
             assert!(matches!(&body[0], Stmt::Return(None)));
@@ -150,7 +150,7 @@ fn test_parse_struct_with_method() {
 
 #[test]
 fn test_parse_instantiate() {
-    let stmts = parse("umba Server s;");
+    let stmts = parse("bumba Server s;");
     assert!(matches!(&stmts[0], Stmt::Instantiate { struct_name, var_name }
         if struct_name == "Server" && var_name == "s"));
 }
