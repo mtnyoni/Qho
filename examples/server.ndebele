@@ -31,6 +31,8 @@ isigoqelo greet(name: ibala) {
 
 // Create a server instance and use it
 umba Server s;
+s.IP = "127.0.0.1";
+s.port = 8080;
 s.Start();
 s.Accept();
 s.Send("Hello network!");

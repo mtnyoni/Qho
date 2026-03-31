@@ -277,6 +277,16 @@ impl Interpreter {
                 let instance = self.create_instance(struct_name, &def, &[]);
                 self.vars.insert(var_name.clone(), instance);
             }
+            Stmt::InstanceFieldAssign { var_name, field, value } => {
+                let val = self.eval_expr(value);
+                match self.vars.get_mut(var_name) {
+                    Some(Value::Instance { fields, .. }) => { fields.insert(field.clone(), val); }
+                    _ => {
+                        eprintln!("Runtime error: '{}' is not a struct instance", var_name);
+                        std::process::exit(1);
+                    }
+                }
+            }
             Stmt::ExprStmt(expr) => {
                 self.eval_expr(expr);
             }

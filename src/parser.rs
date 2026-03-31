@@ -87,8 +87,10 @@ pub enum Stmt {
     Instantiate { struct_name: String, var_name: String },
     /// expr;  -- covers calls like server.Start(); or greet("hi");
     ExprStmt(Expr),
-    /// _lona.field = expr;
+    /// mina.field = expr;
     FieldAssign { field: String, value: Expr },
+    /// varName.field = expr;
+    InstanceFieldAssign { var_name: String, field: String, value: Expr },
 }
 
 // ── Parser ───────────────────────────────────────────────────────────────────
@@ -344,9 +346,33 @@ impl Parser {
                 eprintln!("Syntax error: unexpected end of file");
                 std::process::exit(1);
             }
-            // expression statement: call or field access ending in ;
+            // expression statement or instance field assignment: var.field = val;
             _ => {
                 let expr = self.parse_expr();
+                // check for instance field assignment: var.field = expr;
+                if self.peek() == &Token::Equals {
+                    self.advance();
+                    // expr must be a FieldAccess on a plain Identifier
+                    match expr {
+                        Expr::FieldAccess { object, field } => {
+                            match *object {
+                                Expr::Identifier(var_name) => {
+                                    let value = self.parse_expr();
+                                    self.expect(&Token::Semicolon);
+                                    return Stmt::InstanceFieldAssign { var_name, field, value };
+                                }
+                                _ => {
+                                    eprintln!("Syntax error: invalid assignment target");
+                                    std::process::exit(1);
+                                }
+                            }
+                        }
+                        _ => {
+                            eprintln!("Syntax error: invalid assignment target");
+                            std::process::exit(1);
+                        }
+                    }
+                }
                 self.expect(&Token::Semicolon);
                 Stmt::ExprStmt(expr)
             }
