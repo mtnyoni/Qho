@@ -109,6 +109,11 @@ impl Lexer {
         let mut ident = String::from(first);
         while let Some(c) = self.peek() {
             if c.is_alphanumeric() || c == '_' { ident.push(c); self.advance(); }
+            else if c == ':' && self.input.get(self.pos + 1).copied() == Some(':') {
+                // consume :: and continue reading the rest as part of the identifier
+                ident.push(':'); self.advance();
+                ident.push(':'); self.advance();
+            }
             else { break; }
         }
         ident

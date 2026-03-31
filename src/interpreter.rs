@@ -89,13 +89,13 @@ impl Interpreter {
 
     /// Register all stdlib built-ins — no imports needed in .ndebele files
     fn register_builtins(&mut self) {
-        // net
-        self.builtins.insert("tcpLalela".into(),  net::builtin_tcp_lalela);
-        self.builtins.insert("tcpAmukela".into(), net::builtin_tcp_amukela);
-        self.builtins.insert("tcpXhumana".into(), net::builtin_tcp_xhumana);
-        self.builtins.insert("tcpFunda".into(),   net::builtin_tcp_funda);
-        self.builtins.insert("tcpThumela".into(), net::builtin_tcp_thumela);
-        self.builtins.insert("tcpVala".into(),    net::builtin_tcp_vala);
+        // TCP namespace
+        self.builtins.insert("TCP::lalela".into(),  net::builtin_tcp_lalela);
+        self.builtins.insert("TCP::yamukela".into(), net::builtin_tcp_amukela);
+        self.builtins.insert("TCP::xhumana".into(), net::builtin_tcp_xhumana);
+        self.builtins.insert("TCP::funda".into(),   net::builtin_tcp_funda);
+        self.builtins.insert("TCP::thumela".into(), net::builtin_tcp_thumela);
+        self.builtins.insert("TCP::vala".into(),    net::builtin_tcp_vala);
     }
 
     // ── Expressions ──────────────────────────────────────────────────────────

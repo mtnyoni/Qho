@@ -55,7 +55,7 @@ Files must have the `.ndebele` extension.
 ```js
 inombolo iminyaka = 25;
 ibala ibizo = "Tawanda";
-yenza conn = tcpXhumana("127.0.0.1:8080");
+yenza conn = TCP::xhumana("127.0.0.1:8080");
 ```
 
 ### Functions
@@ -118,30 +118,30 @@ All networking functions are built-in — no imports needed.
 
 | Function | Description |
 |---|---|
-| `tcpLalela(addr)` | Bind and listen on an address |
-| `tcpAmukela(listener)` | Accept an incoming connection |
-| `tcpXhumana(addr)` | Connect to a remote server |
-| `tcpFunda(stream)` | Read a line from a stream (returns `nil` on disconnect) |
-| `tcpThumela(stream, msg)` | Send a message over a stream |
-| `tcpVala(stream)` | Close a connection |
+| `TCP::lalela(addr)` | Bind and listen on an address |
+| `TCP::yamukela(listener)` | Accept an incoming connection |
+| `TCP::xhumana(addr)` | Connect to a remote server |
+| `TCP::funda(stream)` | Read a line from a stream (returns `akulalutho` on disconnect) |
+| `TCP::thumela(stream, msg)` | Send a message over a stream |
+| `TCP::vala(stream)` | Close a connection |
 
 ### Echo Server Example
 
 ```js
-yenza listener = tcpLalela("127.0.0.1:8080");
+yenza listener = TCP::lalela("127.0.0.1:8080");
 
 phinda {
-    yenza conn = tcpAmukela(listener);
+    yenza conn = TCP::yamukela(listener);
 
     phinda {
-        yenza msg = tcpFunda(conn);
+        yenza msg = TCP::funda(conn);
 
         uma (msg == akulalutho) {
-            tcpVala(conn);
+            TCP::vala(conn);
             phuma;
         }
 
-        tcpThumela(conn, msg);
+        TCP::thumela(conn, msg);
     }
 }
 ```

@@ -1,27 +1,26 @@
 // Echo server — keeps running, echoes back whatever the client sends
 // Run first: qho examples/echo_server.ndebele
 
-yenza listener = tcpLalela("127.0.0.1:8080");
+yenza listener = TCP::lalela("127.0.0.1:8080");
+
 bhala("Echo server ready. Waiting for connections...");
 
 phinda {
-    yenza conn = tcpAmukela(listener);
+    yenza conn = TCP::yamukela(listener);
     bhala("Client connected. Reading messages...");
 
     phinda {
-        yenza msg = tcpFunda(conn);
+        yenza msg = TCP::funda(conn);
 
-        // nil means client disconnected
         uma (msg == akulalutho) {
             bhala("Client disconnected.");
-            tcpVala(conn);
+            TCP::vala(conn);
             phuma;
         }
 
         bhala("Received:");
         bhala(msg);
 
-        // echo it back
-        tcpThumela(conn, msg);
+        TCP::thumela(conn, msg);
     }
 }
