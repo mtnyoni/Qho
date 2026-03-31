@@ -12,7 +12,7 @@ phinda {
     phinda {
         yenza umlayezo = TCP::funda(conn);
 
-        uma (umlayezo == akulalutho) {
+        uma (kungela umlayezo) {
             bhala("Client disconnected.");
             TCP::vala(conn);
             phuma;

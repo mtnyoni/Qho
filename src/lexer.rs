@@ -17,6 +17,7 @@ pub enum Token {
     Phendusa,    // return
     Mina,        // self (mina inside methods)
     Nil,         // nil literal
+    Kungela,   // syntactic sugar: kungela x  =>  x == akulalutho
 
     // Literals
     StringLiteral(String),
@@ -177,6 +178,7 @@ impl Lexer {
                         "phendukisa" => Token::Phendusa,
                         "mina"       => Token::Mina,
                         "akulalutho" => Token::Nil,
+                        "kungela"  => Token::Kungela,
                         _            => Token::Identifier(ident),
                     };
                     tokens.push(tok);

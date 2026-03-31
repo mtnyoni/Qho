@@ -180,6 +180,17 @@ impl Parser {
 
     fn parse_condition(&mut self) -> Condition {
         self.expect(&Token::LParen);
+        // syntactic sugar: kungela x  =>  x == akulalutho
+        if self.peek() == &Token::Kungela {
+            self.advance();
+            let expr = self.parse_expr();
+            self.expect(&Token::RParen);
+            return Condition {
+                left: expr,
+                op: CmpOp::EqEq,
+                right: Expr::Identifier("__nil__".to_string()),
+            };
+        }
         let left = self.parse_expr();
         let op = self.parse_cmp_op();
         let right = self.parse_expr();
