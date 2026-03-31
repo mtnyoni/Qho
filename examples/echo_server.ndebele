@@ -12,7 +12,7 @@ phinda {
         bamba msg = tcpFunda(conn);
 
         // nil means client disconnected
-        uma (msg == nil) {
+        uma (msg == akulalutho) {
             bhala("Client disconnected.");
             tcpVala(conn);
             phuma;

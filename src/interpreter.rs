@@ -24,7 +24,7 @@ impl std::fmt::Debug for Value {
             Value::Instance { struct_name, .. } => write!(f, "Instance({})", struct_name),
             Value::Listener(_) => write!(f, "TcpListener"),
             Value::Stream(_)   => write!(f, "TcpStream"),
-            Value::Nil         => write!(f, "Nil"),
+            Value::Nil         => write!(f, "akulalutho"),
         }
     }
 }
@@ -39,7 +39,7 @@ impl std::fmt::Display for Value {
             Value::Instance { struct_name, .. } => write!(f, "<{} instance>", struct_name),
             Value::Listener(_) => write!(f, "<TcpListener>"),
             Value::Stream(_)   => write!(f, "<TcpStream>"),
-            Value::Nil         => write!(f, "nil"),
+            Value::Nil         => write!(f, "akulalutho"),
         }
     }
 }

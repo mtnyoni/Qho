@@ -48,7 +48,7 @@ Files must have the `.ndebele` extension.
 | `umba` | instantiate a struct |
 | `mina` | self (inside methods) |
 | `phendusa` | return |
-| `nil` | null value |
+| `akulalutho` | null value |
 
 ### Variables
 
@@ -136,7 +136,7 @@ phinda {
     phinda {
         bamba msg = tcpFunda(conn);
 
-        uma (msg == nil) {
+        uma (msg == akulalutho) {
             tcpVala(conn);
             phuma;
         }

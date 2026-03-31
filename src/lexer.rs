@@ -171,7 +171,7 @@ impl Lexer {
                         "bamba"      => Token::Bamba,
                         "phendusa"   => Token::Phendusa,
                         "mina"       => Token::Mina,
-                        "nil"        => Token::Nil,
+                        "akulalutho" => Token::Nil,
                         _            => Token::Identifier(ident),
                     };
                     tokens.push(tok);
