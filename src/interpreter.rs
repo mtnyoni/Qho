@@ -331,4 +331,9 @@ impl Interpreter {
     pub fn run(&mut self, stmts: &[Stmt]) {
         self.exec_block(stmts);
     }
+
+    /// Expose vars for testing
+    pub fn get_var(&self, name: &str) -> Option<&Value> {
+        self.vars.get(name)
+    }
 }

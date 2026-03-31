@@ -2,6 +2,8 @@ mod lexer;
 mod parser;
 mod interpreter;
 mod stdlib;
+#[cfg(test)]
+mod tests;
 
 use lexer::Lexer;
 use parser::Parser;

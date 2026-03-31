@@ -52,7 +52,7 @@ Files must have the `.ndebele` extension.
 
 ### Variables
 
-```ndebele
+```js
 inombolo iminyaka = 25;
 ibala ibizo = "Tawanda";
 bamba conn = tcpXhumana("127.0.0.1:8080");
@@ -60,23 +60,23 @@ bamba conn = tcpXhumana("127.0.0.1:8080");
 
 ### Functions
 
-```ndebele
-isigoqelo greet(name: ibala) {
+```js
+isigoqelo bingelela(name: ibala) {
     bhala("Sawubona,");
     bhala(name);
 }
 
-greet("Tawanda");
+bingelela("Tawanda");
 ```
 
 ### Structs and Methods
 
-```ndebele
+```js
 isakhi Server {
     ibala IP
     inombolo port
 
-    isigoqelo Start() {
+    isigoqelo qala() {
         bhala("Starting on:");
         bhala(mina.IP);
     }
@@ -85,12 +85,12 @@ isakhi Server {
 umba Server s;
 s.IP = "127.0.0.1";
 s.port = 8080;
-s.Start();
+s.qala();
 ```
 
 ### Control Flow
 
-```ndebele
+```js
 uma (x > 5) {
     bhala("greater than 5");
 }
@@ -127,7 +127,7 @@ All networking functions are built-in — no imports needed.
 
 ### Echo Server Example
 
-```ndebele
+```js
 bamba listener = tcpLalela("127.0.0.1:8080");
 
 phinda {
