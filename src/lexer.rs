@@ -13,8 +13,10 @@ pub enum Token {
     Isigoqelo,   // function
     Isakhi,      // struct
     Umba,        // instantiate a struct
+    Bamba,       // generic value binding (val)
     Phendusa,    // return
     Mina,        // self (mina inside methods)
+    Nil,         // nil literal
 
     // Literals
     StringLiteral(String),
@@ -166,8 +168,10 @@ impl Lexer {
                         "isigoqelo"  => Token::Isigoqelo,
                         "isakhi"     => Token::Isakhi,
                         "umba"       => Token::Umba,
+                        "bamba"      => Token::Bamba,
                         "phendusa"   => Token::Phendusa,
                         "mina"       => Token::Mina,
+                        "nil"        => Token::Nil,
                         _            => Token::Identifier(ident),
                     };
                     tokens.push(tok);

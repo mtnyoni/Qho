@@ -65,6 +65,8 @@ pub enum Stmt {
     DeclareNumber { name: String, value: f64 },
     /// ibala s = "hi";
     DeclareString { name: String, value: String },
+    /// bamba x = expr;  -- generic binding, accepts any value
+    DeclareVal { name: String, expr: Expr },
     /// bhala(expr);
     Print(Expr),
     /// uma (cond) { body }
@@ -191,6 +193,7 @@ impl Parser {
             Token::StringLiteral(s) => Expr::StringLiteral(s),
             Token::NumberLiteral(n) => Expr::NumberLiteral(n),
             Token::Mina             => Expr::Identifier("mina".to_string()),
+            Token::Nil              => Expr::Identifier("__nil__".to_string()),
             Token::Identifier(name) => Expr::Identifier(name),
             tok => { eprintln!("Syntax error: expected expression, got {:?}", tok); std::process::exit(1); }
         };
@@ -246,6 +249,14 @@ impl Parser {
                 };
                 self.expect(&Token::Semicolon);
                 Stmt::DeclareString { name, value }
+            }
+            Token::Bamba => {
+                self.advance();
+                let name = self.expect_identifier();
+                self.expect(&Token::Equals);
+                let expr = self.parse_expr();
+                self.expect(&Token::Semicolon);
+                Stmt::DeclareVal { name, expr }
             }
             Token::Bhala => {
                 self.advance();

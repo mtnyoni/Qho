@@ -1,0 +1,28 @@
+// Echo server — keeps running, echoes back whatever the client sends
+// Run first: ndebele-pl examples/echo_server.ndebele
+
+bamba listener = tcpLalela("127.0.0.1:8080");
+
+bhala("Echo server ready. Waiting for connections...");
+
+phinda {
+    bamba conn = tcpAmukela(listener);
+    bhala("Client connected. Reading messages...");
+
+    phinda {
+        bamba msg = tcpFunda(conn);
+
+        // nil means client disconnected
+        uma (msg == nil) {
+            bhala("Client disconnected.");
+            tcpVala(conn);
+            phuma;
+        }
+
+        bhala("Received:");
+        bhala(msg);
+
+        // echo it back
+        tcpThumela(conn, msg);
+    }
+}

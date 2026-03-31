@@ -1,18 +1,32 @@
 use std::collections::HashMap;
+use std::net::{TcpListener, TcpStream};
+use std::sync::{Arc, Mutex};
 use crate::parser::{CmpOp, Condition, Expr, FieldDef, MethodDef, Param, Stmt, TypeAnnotation};
+use crate::stdlib::net;
 
 // ── Values ───────────────────────────────────────────────────────────────────
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum Value {
     Number(f64),
     Str(String),
-    /// An instance of a struct
-    Instance {
-        struct_name: String,
-        fields: HashMap<String, Value>,
-    },
+    Instance { struct_name: String, fields: HashMap<String, Value> },
+    Listener(Arc<Mutex<TcpListener>>),
+    Stream(Arc<Mutex<TcpStream>>),
     Nil,
+}
+
+impl std::fmt::Debug for Value {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Value::Number(n)   => write!(f, "Number({})", n),
+            Value::Str(s)      => write!(f, "Str({:?})", s),
+            Value::Instance { struct_name, .. } => write!(f, "Instance({})", struct_name),
+            Value::Listener(_) => write!(f, "TcpListener"),
+            Value::Stream(_)   => write!(f, "TcpStream"),
+            Value::Nil         => write!(f, "Nil"),
+        }
+    }
 }
 
 impl std::fmt::Display for Value {
@@ -21,9 +35,11 @@ impl std::fmt::Display for Value {
             Value::Number(n) => {
                 if n.fract() == 0.0 { write!(f, "{}", *n as i64) } else { write!(f, "{}", n) }
             }
-            Value::Str(s) => write!(f, "{}", s),
+            Value::Str(s)      => write!(f, "{}", s),
             Value::Instance { struct_name, .. } => write!(f, "<{} instance>", struct_name),
-            Value::Nil => write!(f, "nil"),
+            Value::Listener(_) => write!(f, "<TcpListener>"),
+            Value::Stream(_)   => write!(f, "<TcpStream>"),
+            Value::Nil         => write!(f, "nil"),
         }
     }
 }
@@ -35,6 +51,10 @@ pub struct StructDef {
     pub fields: Vec<FieldDef>,
     pub methods: Vec<MethodDef>,
 }
+
+// ── Built-in function pointer ─────────────────────────────────────────────────
+
+type BuiltinFn = fn(&[Value]) -> Value;
 
 // ── Signals ──────────────────────────────────────────────────────────────────
 
@@ -49,21 +69,33 @@ enum Signal {
 // ── Interpreter ──────────────────────────────────────────────────────────────
 
 pub struct Interpreter {
-    /// Global / local variable scope (flat for now)
-    vars: HashMap<String, Value>,
-    /// Registered struct definitions
-    structs: HashMap<String, StructDef>,
-    /// Registered top-level functions: name -> (params, body)
+    vars:      HashMap<String, Value>,
+    structs:   HashMap<String, StructDef>,
     functions: HashMap<String, (Vec<Param>, Vec<Stmt>)>,
+    builtins:  HashMap<String, BuiltinFn>,
 }
 
 impl Interpreter {
     pub fn new() -> Self {
-        Interpreter {
-            vars: HashMap::new(),
-            structs: HashMap::new(),
+        let mut interp = Interpreter {
+            vars:      HashMap::new(),
+            structs:   HashMap::new(),
             functions: HashMap::new(),
-        }
+            builtins:  HashMap::new(),
+        };
+        interp.register_builtins();
+        interp
+    }
+
+    /// Register all stdlib built-ins — no imports needed in .ndebele files
+    fn register_builtins(&mut self) {
+        // net
+        self.builtins.insert("tcpLalela".into(),  net::builtin_tcp_lalela);
+        self.builtins.insert("tcpAmukela".into(), net::builtin_tcp_amukela);
+        self.builtins.insert("tcpXhumana".into(), net::builtin_tcp_xhumana);
+        self.builtins.insert("tcpFunda".into(),   net::builtin_tcp_funda);
+        self.builtins.insert("tcpThumela".into(), net::builtin_tcp_thumela);
+        self.builtins.insert("tcpVala".into(),    net::builtin_tcp_vala);
     }
 
     // ── Expressions ──────────────────────────────────────────────────────────
@@ -73,6 +105,7 @@ impl Interpreter {
             Expr::StringLiteral(s) => Value::Str(s.clone()),
             Expr::NumberLiteral(n) => Value::Number(*n),
             Expr::Identifier(name) => {
+                if name == "__nil__" { return Value::Nil; }
                 self.vars.get(name).cloned().unwrap_or_else(|| {
                     eprintln!("Runtime error: undefined variable '{}'", name);
                     std::process::exit(1);
@@ -90,9 +123,7 @@ impl Interpreter {
                     _ => { eprintln!("Runtime error: field access on non-instance"); std::process::exit(1); }
                 }
             }
-            Expr::Call { callee, args } => {
-                self.eval_call(callee, args)
-            }
+            Expr::Call { callee, args } => self.eval_call(callee, args),
         }
     }
 
@@ -100,24 +131,26 @@ impl Interpreter {
         let arg_vals: Vec<Value> = args.iter().map(|a| self.eval_expr(a)).collect();
 
         match callee {
-            // plain function call: greet(...)
             Expr::Identifier(name) => {
-                // built-in: new StructName(...)  -- create instance
-                if let Some(def) = self.structs.get(name) {
-                    return self.create_instance(name, def, &arg_vals);
+                // 1. built-in function
+                if let Some(f) = self.builtins.get(name) {
+                    return f(&arg_vals);
                 }
-                // user-defined function
+                // 2. struct instantiation
+                if let Some(def) = self.structs.get(name) {
+                    return self.create_instance(name, def);
+                }
+                // 3. user-defined function
                 if let Some((params, body)) = self.functions.get(name) {
                     return self.call_function(params.clone(), body.clone(), &arg_vals, None);
                 }
                 eprintln!("Runtime error: undefined function or struct '{}'", name);
                 std::process::exit(1);
             }
-            // method call: instance.Method(...)
             Expr::FieldAccess { object, field } => {
                 let obj = self.eval_expr(object);
                 match &obj {
-                    Value::Instance { struct_name, fields: _ } => {
+                    Value::Instance { struct_name, .. } => {
                         let def = self.structs.get(struct_name).cloned().unwrap_or_else(|| {
                             eprintln!("Runtime error: unknown struct '{}'", struct_name);
                             std::process::exit(1);
@@ -141,21 +174,19 @@ impl Interpreter {
         }
     }
 
-    /// Create a struct instance with default field values
-    fn create_instance(&self, name: &str, def: &StructDef, _args: &[Value]) -> Value {
+    fn create_instance(&self, name: &str, def: &StructDef) -> Value {
         let mut fields = HashMap::new();
         for f in &def.fields {
             let default = match &f.ty {
-                TypeAnnotation::Inombolo   => Value::Number(0.0),
-                TypeAnnotation::Ibala      => Value::Str(String::new()),
-                TypeAnnotation::Named(_)   => Value::Nil,
+                TypeAnnotation::Inombolo => Value::Number(0.0),
+                TypeAnnotation::Ibala    => Value::Str(String::new()),
+                TypeAnnotation::Named(_) => Value::Nil,
             };
             fields.insert(f.name.clone(), default);
         }
         Value::Instance { struct_name: name.to_string(), fields }
     }
 
-    /// Execute a function/method body in a child scope
     fn call_function(
         &self,
         params: Vec<Param>,
@@ -163,24 +194,18 @@ impl Interpreter {
         args: &[Value],
         self_val: Option<Value>,
     ) -> Value {
-        // build child interpreter with its own var scope
         let mut child = Interpreter {
-            vars: self.vars.clone(),
-            structs: self.structs.clone(),
+            vars:      self.vars.clone(),
+            structs:   self.structs.clone(),
             functions: self.functions.clone(),
+            builtins:  self.builtins.clone(),
         };
-
-        // bind _lona if this is a method call
         if let Some(sv) = self_val {
             child.vars.insert("mina".to_string(), sv);
         }
-
-        // bind parameters
         for (i, param) in params.iter().enumerate() {
-            let val = args.get(i).cloned().unwrap_or(Value::Nil);
-            child.vars.insert(param.name.clone(), val);
+            child.vars.insert(param.name.clone(), args.get(i).cloned().unwrap_or(Value::Nil));
         }
-
         match child.exec_block(&body) {
             Signal::Return(v) => v,
             _ => Value::Nil,
@@ -201,6 +226,11 @@ impl Interpreter {
             (CmpOp::GtEq,  Value::Number(a), Value::Number(b)) => a >= b,
             (CmpOp::EqEq,  Value::Str(a),    Value::Str(b))    => a == b,
             (CmpOp::NotEq, Value::Str(a),    Value::Str(b))    => a != b,
+            (CmpOp::EqEq,  Value::Nil,       Value::Nil)       => true,
+            (CmpOp::NotEq, Value::Nil,       Value::Nil)       => false,
+            // nil check: val == nil  or  nil != val
+            (CmpOp::EqEq,  Value::Nil, _) | (CmpOp::EqEq,  _, Value::Nil) => false,
+            (CmpOp::NotEq, Value::Nil, _) | (CmpOp::NotEq, _, Value::Nil) => true,
             _ => { eprintln!("Runtime error: cannot compare {:?} and {:?}", l, r); std::process::exit(1); }
         }
     }
@@ -225,32 +255,32 @@ impl Interpreter {
             Stmt::DeclareString { name, value } => {
                 self.vars.insert(name.clone(), Value::Str(value.clone()));
             }
-            Stmt::Print(expr) => {
-                println!("{}", self.eval_expr(expr));
+            Stmt::DeclareVal { name, expr } => {
+                let val = self.eval_expr(expr);
+                self.vars.insert(name.clone(), val);
             }
+            Stmt::Print(expr) => { println!("{}", self.eval_expr(expr)); }
             Stmt::If { condition, body } => {
-                if self.eval_condition(condition) {
-                    return self.exec_block(body);
-                }
+                if self.eval_condition(condition) { return self.exec_block(body); }
             }
             Stmt::While { condition, body } => {
                 loop {
                     if !self.eval_condition(condition) { break; }
                     match self.exec_block(body) {
-                        Signal::Break    => break,
-                        Signal::Continue => continue,
-                        sig @ Signal::Return(_) => return sig,
-                        Signal::None     => {}
+                        Signal::Break            => break,
+                        Signal::Continue         => continue,
+                        sig @ Signal::Return(_)  => return sig,
+                        Signal::None             => {}
                     }
                 }
             }
             Stmt::Loop { body } => {
                 loop {
                     match self.exec_block(body) {
-                        Signal::Break    => break,
-                        Signal::Continue => continue,
-                        sig @ Signal::Return(_) => return sig,
-                        Signal::None     => {}
+                        Signal::Break            => break,
+                        Signal::Continue         => continue,
+                        sig @ Signal::Return(_)  => return sig,
+                        Signal::None             => {}
                     }
                 }
             }
@@ -274,23 +304,17 @@ impl Interpreter {
                     eprintln!("Runtime error: unknown struct '{}'", struct_name);
                     std::process::exit(1);
                 });
-                let instance = self.create_instance(struct_name, &def, &[]);
+                let instance = self.create_instance(struct_name, &def);
                 self.vars.insert(var_name.clone(), instance);
             }
             Stmt::InstanceFieldAssign { var_name, field, value } => {
                 let val = self.eval_expr(value);
                 match self.vars.get_mut(var_name) {
                     Some(Value::Instance { fields, .. }) => { fields.insert(field.clone(), val); }
-                    _ => {
-                        eprintln!("Runtime error: '{}' is not a struct instance", var_name);
-                        std::process::exit(1);
-                    }
+                    _ => { eprintln!("Runtime error: '{}' is not a struct instance", var_name); std::process::exit(1); }
                 }
             }
-            Stmt::ExprStmt(expr) => {
-                self.eval_expr(expr);
-            }
-            // mina.field = value;  -- mutate the mina instance in scope
+            Stmt::ExprStmt(expr) => { self.eval_expr(expr); }
             Stmt::FieldAssign { field, value } => {
                 let val = self.eval_expr(value);
                 if let Some(Value::Instance { fields, .. }) = self.vars.get_mut("mina") {
