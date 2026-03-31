@@ -6,19 +6,19 @@ yenza conn = TCP::xhumana("127.0.0.1:8080");
 bhala("Connected to echo server.");
 
 TCP::thumela(conn, "Sawubona Server!");
-yenza reply1 = TCP::funda(conn);
+yenza impendulo = TCP::funda(conn);
 bhala("Server said:");
-bhala(reply1);
+bhala(impendulo);
 
 TCP::thumela(conn, "Kunjani?");
-yenza reply2 = TCP::funda(conn);
+yenza impendulo2 = TCP::funda(conn);
 bhala("Server said:");
-bhala(reply2);
+bhala(impendulo2);
 
 TCP::thumela(conn, "Ngiyabonga. Sala kahle!");
-yenza reply3 = TCP::funda(conn);
+yenza impendulo3 = TCP::funda(conn);
 bhala("Server said:");
-bhala(reply3);
+bhala(impendulo3);
 
 TCP::vala(conn);
 bhala("Connection closed.");
