@@ -1,0 +1,39 @@
+// Define a Server struct
+isakhi Server {
+    ibala IP
+    inombolo port
+
+    isigoqelo Start() {
+        bhala("Server starting...");
+        bhala(mina.IP);
+        bhala(mina.port);
+    }
+
+    isigoqelo Accept() {
+        bhala("Accepting connections...");
+    }
+
+    isigoqelo Send(msg: ibala) {
+        bhala("Sending:");
+        bhala(msg);
+    }
+
+    isigoqelo Recv() {
+        bhala("Receiving data...");
+    }
+}
+
+// Standalone function
+isigoqelo greet(name: ibala) {
+    bhala("Sawubona,");
+    bhala(name);
+}
+
+// Create a server instance and use it
+umba Server s;
+s.Start();
+s.Accept();
+s.Send("Hello network!");
+s.Recv();
+
+greet("Tawanda");

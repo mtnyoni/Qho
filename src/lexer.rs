@@ -1,16 +1,45 @@
 /// Tokens for the Ndebele language
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
-    // Keyword: print to console
-    FakaAmabalaKuScreen,
-    // A string literal e.g. "hello"
+    // Keywords
+    Bhala,       // print
+    Inombolo,    // float64 type
+    Ibala,       // string type
+    Uma,         // if
+    PhindaUma,   // while
+    Phinda,      // loop (infinite)
+    Phuma,       // break
+    Qhubeka,     // continue
+    Isigoqelo,   // function
+    Isakhi,      // struct
+    Umba,        // instantiate a struct
+    Phendusa,    // return
+    Mina,        // self (mina inside methods)
+
+    // Literals
     StringLiteral(String),
-    // ( ) 
-    LParen,
-    RParen,
-    // End of statement
-    Semicolon,
-    // End of file
+    NumberLiteral(f64),
+
+    // Identifier (variable name / struct name / function name)
+    Identifier(String),
+
+    // Symbols
+    Equals,    // =
+    EqEq,      // ==
+    NotEq,     // !=
+    Lt,        // <
+    Gt,        // >
+    LtEq,      // <=
+    GtEq,      // >=
+    LParen,    // (
+    RParen,    // )
+    LBrace,    // {
+    RBrace,    // }
+    Semicolon, // ;
+    Colon,     // :
+    Comma,     // ,
+    Dot,       // .
+
     EOF,
 }
 
@@ -21,10 +50,7 @@ pub struct Lexer {
 
 impl Lexer {
     pub fn new(source: &str) -> Self {
-        Lexer {
-            input: source.chars().collect(),
-            pos: 0,
-        }
+        Lexer { input: source.chars().collect(), pos: 0 }
     }
 
     fn peek(&self) -> Option<char> {
@@ -37,14 +63,24 @@ impl Lexer {
         ch
     }
 
-    fn skip_whitespace(&mut self) {
-        while matches!(self.peek(), Some(c) if c.is_whitespace()) {
-            self.advance();
+    fn skip_whitespace_and_comments(&mut self) {
+        loop {
+            // skip whitespace
+            while matches!(self.peek(), Some(c) if c.is_whitespace()) {
+                self.advance();
+            }
+            // skip // line comments
+            if self.peek() == Some('/') && self.input.get(self.pos + 1).copied() == Some('/') {
+                while !matches!(self.peek(), Some('\n') | None) {
+                    self.advance();
+                }
+            } else {
+                break;
+            }
         }
     }
 
     fn read_string(&mut self) -> String {
-        // opening quote already consumed
         let mut s = String::new();
         loop {
             match self.advance() {
@@ -55,15 +91,23 @@ impl Lexer {
         s
     }
 
-    fn read_identifier(&mut self) -> String {
-        let mut ident = String::new();
+    fn read_number(&mut self, first: char) -> f64 {
+        let mut num = String::from(first);
         while let Some(c) = self.peek() {
-            if c.is_alphanumeric() || c == '_' {
-                ident.push(c);
-                self.advance();
-            } else {
-                break;
-            }
+            if c.is_ascii_digit() || c == '.' { num.push(c); self.advance(); }
+            else { break; }
+        }
+        num.parse().unwrap_or_else(|_| {
+            eprintln!("Lexer error: invalid number '{}'", num);
+            std::process::exit(1);
+        })
+    }
+
+    fn read_identifier(&mut self, first: char) -> String {
+        let mut ident = String::from(first);
+        while let Some(c) = self.peek() {
+            if c.is_alphanumeric() || c == '_' { ident.push(c); self.advance(); }
+            else { break; }
         }
         ident
     }
@@ -71,29 +115,67 @@ impl Lexer {
     pub fn tokenize(&mut self) -> Vec<Token> {
         let mut tokens = Vec::new();
         loop {
-            self.skip_whitespace();
+            self.skip_whitespace_and_comments();
             match self.peek() {
-                None => {
-                    tokens.push(Token::EOF);
-                    break;
-                }
-                Some('"') => {
-                    self.advance(); // consume opening quote
-                    let s = self.read_string();
-                    tokens.push(Token::StringLiteral(s));
-                }
+                None => { tokens.push(Token::EOF); break; }
+                Some('"') => { self.advance(); tokens.push(Token::StringLiteral(self.read_string())); }
                 Some('(') => { self.advance(); tokens.push(Token::LParen); }
                 Some(')') => { self.advance(); tokens.push(Token::RParen); }
+                Some('{') => { self.advance(); tokens.push(Token::LBrace); }
+                Some('}') => { self.advance(); tokens.push(Token::RBrace); }
                 Some(';') => { self.advance(); tokens.push(Token::Semicolon); }
-                Some(c) if c.is_alphabetic() => {
-                    let ident = self.read_identifier();
+                Some(':') => { self.advance(); tokens.push(Token::Colon); }
+                Some(',') => { self.advance(); tokens.push(Token::Comma); }
+                Some('.') => { self.advance(); tokens.push(Token::Dot); }
+                Some('=') => {
+                    self.advance();
+                    if self.peek() == Some('=') { self.advance(); tokens.push(Token::EqEq); }
+                    else { tokens.push(Token::Equals); }
+                }
+                Some('!') => {
+                    self.advance();
+                    if self.peek() == Some('=') { self.advance(); tokens.push(Token::NotEq); }
+                    else { eprintln!("Lexer error: unexpected '!'"); std::process::exit(1); }
+                }
+                Some('<') => {
+                    self.advance();
+                    if self.peek() == Some('=') { self.advance(); tokens.push(Token::LtEq); }
+                    else { tokens.push(Token::Lt); }
+                }
+                Some('>') => {
+                    self.advance();
+                    if self.peek() == Some('=') { self.advance(); tokens.push(Token::GtEq); }
+                    else { tokens.push(Token::Gt); }
+                }
+                Some(c) if c.is_ascii_digit() => {
+                    self.advance();
+                    tokens.push(Token::NumberLiteral(self.read_number(c)));
+                }
+                Some(c) if c.is_alphabetic() || c == '_' => {
+                    self.advance();
+                    let ident = self.read_identifier(c);
                     let tok = match ident.as_str() {
-                        "fakaAmabalaKuScreen" => Token::FakaAmabalaKuScreen,
-                        _ => panic!("Unknown identifier: {}", ident),
+                        "bhala"      => Token::Bhala,
+                        "inombolo"   => Token::Inombolo,
+                        "ibala"      => Token::Ibala,
+                        "uma"        => Token::Uma,
+                        "phindaUma"  => Token::PhindaUma,
+                        "phinda"     => Token::Phinda,
+                        "phuma"      => Token::Phuma,
+                        "qhubeka"    => Token::Qhubeka,
+                        "isigoqelo"  => Token::Isigoqelo,
+                        "isakhi"     => Token::Isakhi,
+                        "umba"       => Token::Umba,
+                        "phendusa"   => Token::Phendusa,
+                        "mina"       => Token::Mina,
+                        _            => Token::Identifier(ident),
                     };
                     tokens.push(tok);
                 }
-                Some(c) => panic!("Unexpected character: {:?}", c),
+                Some(c) => {
+                    eprintln!("Lexer error: unexpected character '{}'", c);
+                    std::process::exit(1);
+                }
             }
         }
         tokens

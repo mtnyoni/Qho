@@ -1,2 +1,27 @@
-fakaAmabalaKuScreen("Sawubona Mhlaba!");
-fakaAmabalaKuScreen("Hello from Ndebele PL!");
+inombolo x = 3;
+inombolo iminyaka = 20;
+ibala ibizo = "Tawanda";
+
+bhala(ibizo);
+
+uma (iminyaka > 18) {
+    bhala("Umuntu omkhulu!");
+}
+
+uma (x == 3) {
+    bhala("x ilingana no 3");
+}
+
+inombolo i = 0;
+phindaUma (i < 5) {
+    bhala(i);
+    inombolo i = 5;
+    phuma;
+}
+
+inombolo count = 0;
+phinda {
+    bhala(count);
+    inombolo count = 10;
+    phuma;
+}
