@@ -1,4 +1,4 @@
-# Ndebele PL
+# Qho
 
 A small programming language built in Rust, with a syntax inspired by the Ndebele language. This project was built as an experiment using [Kiro](https://kiro.dev) — pushing the limits of what an AI-assisted IDE can help you build from scratch in a single session.
 
@@ -16,12 +16,12 @@ A small programming language built in Rust, with a syntax inspired by the Ndebel
 cargo build --release
 ```
 
-The binary will be at `target/release/ndebele-pl.exe` (Windows) or `target/release/ndebele-pl` (Linux/macOS).
+The binary will be at `target/release/qho.exe` (Windows) or `target/release/qho` (Linux/macOS).
 
 ### Run a file
 
 ```bash
-./target/release/ndebele-pl myprogram.ndebele
+./target/release/qho myprogram.ndebele
 ```
 
 Files must have the `.ndebele` extension.
@@ -32,7 +32,7 @@ Files must have the `.ndebele` extension.
 
 ### Keywords
 
-| Ndebele | Meaning |
+| Keyword | Meaning |
 |---|---|
 | `bhala` | print to console |
 | `inombolo` | number type (float64) |
@@ -148,12 +148,12 @@ phinda {
 
 Run the server:
 ```bash
-./ndebele-pl examples/echo_server.ndebele
+./qho examples/echo_server.ndebele
 ```
 
 Run the client in a second terminal:
 ```bash
-./ndebele-pl examples/echo_client.ndebele
+./qho examples/echo_client.ndebele
 ```
 
 ---
@@ -192,7 +192,7 @@ examples/
 ### Todo
 - [ ] Implement a working TCP server (handle multiple clients)
 - [ ] Implement WebSockets
-- [ ] Write a small chat application in Ndebele PL
+- [ ] Write a small chat application in Qho
 - [ ] HTTP server — serve a basic response over TCP
 - [ ] Port scanner — scan a range of ports on a host
 - [ ] Ping utility — check if a host is reachable

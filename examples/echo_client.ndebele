@@ -1,5 +1,5 @@
 // Echo client — sends messages and prints server responses
-// Run after server: ndebele-pl examples/echo_client.ndebele
+// Run after server: qho examples/echo_client.ndebele
 
 bamba conn = tcpXhumana("127.0.0.1:8080");
 
