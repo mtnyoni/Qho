@@ -10,17 +10,17 @@ phinda {
     bhala("Client connected. Reading messages...");
 
     phinda {
-        yenza msg = TCP::funda(conn);
+        yenza umlayezo = TCP::funda(conn);
 
-        uma (msg == akulalutho) {
+        uma (umlayezo == akulalutho) {
             bhala("Client disconnected.");
             TCP::vala(conn);
             phuma;
         }
 
         bhala("Received:");
-        bhala(msg);
+        bhala(umlayezo);
 
-        TCP::thumela(conn, msg);
+        TCP::thumela(conn, umlayezo);
     }
 }
